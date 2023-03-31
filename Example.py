@@ -193,10 +193,13 @@ VEbusErrorDict = {
 def spacer():
     print(colors.fg.gray, "="*80, sep="")
 
-def modbus_register(address, unit):
+def modbus_register(address, unit, signed=False):
     msg     = client.read_input_registers(address, unit=unit)
     decoder = BinaryPayloadDecoder.fromRegisters(msg.registers, byteorder=Endian.Big)
-    msg     = decoder.decode_16bit_int()
+    if signed==False:
+        msg     = decoder.decode_16bit_uint()
+    else:
+        msg     = decoder.decode_16bit_int()
     return msg
 
 try:
@@ -222,27 +225,27 @@ while True:
     
     
         BatterySOC    = modbus_register(266,BmvID) / 10
-        BatteryWatts  = modbus_register(842, unit=VEsystemID)
-        BatteryAmps   = modbus_register(841, unit=VEsystemID) / 10
+        BatteryWatts  = modbus_register(842, unit=VEsystemID, signed=True)
+        BatteryAmps   = modbus_register(841, unit=VEsystemID, signed=True) / 10
         BatteryVolts  = modbus_register(259, unit=BmvID) / 100
         
         SolarVolts    = modbus_register(776, unit=SolarChargerID) / 100
-        SolarAmps     = modbus_register(777, unit=SolarChargerID) / 10
+        SolarAmps     = modbus_register(777, unit=SolarChargerID, signed=True) / 10
         SolarWatts    = modbus_register(789, unit=SolarChargerID) /10
         MaxSolarWatts = modbus_register(785, unit=SolarChargerID)
         SolarYield    = modbus_register(784, unit=SolarChargerID) / 10
         SolarState    = modbus_register(775, unit=SolarChargerID)
         
-        GridSetPoint  = modbus_register(2700, unit=VEsystemID)
+        GridSetPoint  = modbus_register(2700, unit=VEsystemID, signed=True)
         GridCondition = modbus_register(64, unit=MultiPlusID)
-        ACoutHZ       = modbus_register(21, unit=MultiPlusID) / 100
+        ACoutHZ       = modbus_register(21, unit=MultiPlusID, signed=True) / 100
         ACoutVolts    = modbus_register(15, unit=MultiPlusID) / 10
-        ACoutAmps     = modbus_register(18, unit=MultiPlusID) / 10
+        ACoutAmps     = modbus_register(18, unit=MultiPlusID, signed=True) / 10
         ACoutWatts    = modbus_register(817, unit=VEsystemID)
-        GridHZ        = modbus_register(9, unit=MultiPlusID) / 100
+        GridHZ        = modbus_register(9, unit=MultiPlusID, signed=True) / 100
         GridVolts     = modbus_register(3, unit=MultiPlusID) / 10
-        GridAmps      = modbus_register(6, unit=MultiPlusID) / 10
-        GridWatts     = modbus_register(820, unit=VEsystemID)
+        GridAmps      = modbus_register(6, unit=MultiPlusID, signed=True) / 10
+        GridWatts     = modbus_register(820, unit=VEsystemID, signed=True)
         
         ESSsocLimitUser     = modbus_register(2901, unit=VEsystemID) / 10
         ESSsocLimitDynamic  = modbus_register(2903, unit=VEsystemID) / 10
